@@ -7,6 +7,7 @@
 <title>Android Developers News</title>
 
 <style>
+
 body {
     font-family: Arial, Helvetica, sans-serif;
     background: #f5f7fa;
@@ -15,10 +16,12 @@ body {
     color: #333;
 }
 
+
 .container {
     max-width: 900px;
     margin: auto;
 }
+
 
 .header {
     background: #3ddc84;
@@ -28,153 +31,290 @@ body {
     margin-bottom: 20px;
 }
 
+
 .header h2 {
-    margin: 0;
+    margin:0;
 }
+
 
 .card {
-    background: white;
-    border-radius: 12px;
-    padding: 18px;
-    margin-bottom: 15px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    transition: transform .2s;
+
+    background:white;
+    border-radius:12px;
+    padding:18px;
+    margin-bottom:18px;
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
+
 }
+
 
 .card:hover {
-    transform: translateY(-3px);
+    transform:translateY(-3px);
 }
+
 
 .card a {
-    color: #1976d2;
-    font-size: 18px;
-    font-weight: bold;
-    text-decoration: none;
+
+    color:#1976d2;
+    font-size:18px;
+    font-weight:bold;
+    text-decoration:none;
+
 }
+
 
 .card a:hover {
-    text-decoration: underline;
+
+    text-decoration:underline;
+
 }
+
+
+.thumb {
+
+    width:100%;
+    max-height:240px;
+    object-fit:cover;
+    border-radius:10px;
+    margin-bottom:15px;
+
+}
+
 
 .date {
-    color: #777;
-    font-size: 13px;
-    margin-top: 8px;
+
+    color:#777;
+    font-size:13px;
+    margin-top:8px;
+
 }
+
 
 .description {
-    margin-top: 10px;
-    line-height: 1.5;
+
+    margin-top:12px;
+    line-height:1.5;
+    color:#444;
+
 }
 
+
 .loading {
+
     text-align:center;
     padding:30px;
+
 }
-.description img {
-    max-width:100%;
-    height:auto;
-    border-radius:10px;
-}
+
+
 .error {
+
     background:#ffe0e0;
     color:#900;
     padding:15px;
     border-radius:10px;
+
 }
+
 </style>
 
 </head>
 
+
 <body>
+
 
 <div class="container">
 
+
 <div class="header">
+
 <h2>📱 Android Developers</h2>
+
 <p>Últimas noticias</p>
+
 </div>
+
+
 
 <div id="news" class="loading">
+
 Cargando noticias...
-</div>
 
 </div>
+
+
+
+</div>
+
 
 
 <script>
 
+
 const rss =
+
 "https://api.rss2json.com/v1/api.json?rss_url=" +
+
 encodeURIComponent(
+
 "https://android-developers.blogspot.com/atom.xml"
+
 );
+
 
 
 fetch(rss)
 
+
+
 .then(response => response.json())
+
+
 
 .then(data => {
 
-    let html = "";
 
-    data.items.slice(0,10).forEach(item => {
+
+let html = "";
+
+
+
+data.items.slice(0,10).forEach(item => {
+
+
+
+    // Buscar imagen dentro del artículo
 
     let imagen = "";
 
-    if (item.thumbnail) {
+    let img = item.description.match(/<img[^>]+src="([^">]+)"/);
+
+
+
+    if (img) {
+
+
         imagen = `
-        <img src="${item.thumbnail}" 
-        style="width:100%; border-radius:10px; margin-bottom:10px;">
+
+        <img class="thumb" src="${img[1]}">
+
         `;
+
+
     }
+
+
+
+
+    // Limpiar HTML del resumen
+
+    let texto = item.description
+
+        .replace(/<[^>]*>/g,'')
+
+        .replace(/&nbsp;/g,' ')
+
+        .trim()
+
+        .substring(0,250);
+
+
+
+
 
     html += `
 
+
+
     <div class="card">
+
+
 
         ${imagen}
 
+
+
         <a href="${item.link}" target="_blank">
+
             ${item.title}
+
         </a>
 
+
+
         <div class="date">
-            📅 ${new Date(item.pubDate).toLocaleDateString("es-ES")}
+
+            📅 ${new Date(item.pubDate)
+
+            .toLocaleDateString("es-ES")}
+
         </div>
 
+
+
         <div class="description">
-            ${item.description}
+
+            ${texto}...
+
         </div>
+
+
 
     </div>
 
+
+
     `;
+
+
 
 });
 
 
-    document.getElementById("news").innerHTML = html;
+
+
+
+document.getElementById("news").innerHTML = html;
+
+
 
 })
 
 
+
 .catch(error => {
 
+
+
 document.getElementById("news").innerHTML =
+
+
+
 `
+
 <div class="error">
+
 ❌ No se pudieron cargar las noticias
+
 <br>
+
 ${error}
+
 </div>
+
 `;
 
+
+
 });
+
+
 
 </script>
 
 
+
 </body>
+
 </html>
