@@ -1,22 +1,170 @@
-<div id="noticias">Cargando...</div>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Android Developers News</title>
+
+<style>
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f5f7fa;
+    margin: 0;
+    padding: 20px;
+    color: #333;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+}
+
+.header {
+    background: #3ddc84;
+    color: white;
+    padding: 18px 22px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+.header h2 {
+    margin: 0;
+}
+
+.card {
+    background: white;
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: transform .2s;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+}
+
+.card a {
+    color: #1976d2;
+    font-size: 18px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.card a:hover {
+    text-decoration: underline;
+}
+
+.date {
+    color: #777;
+    font-size: 13px;
+    margin-top: 8px;
+}
+
+.description {
+    margin-top: 10px;
+    line-height: 1.5;
+}
+
+.loading {
+    text-align:center;
+    padding:30px;
+}
+
+.error {
+    background:#ffe0e0;
+    color:#900;
+    padding:15px;
+    border-radius:10px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+<h2>📱 Android Developers</h2>
+<p>Últimas noticias</p>
+</div>
+
+<div id="news" class="loading">
+Cargando noticias...
+</div>
+
+</div>
+
 
 <script>
-fetch("https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fandroid-developers.blogspot.com%2Fatom.xml")
-.then(r => r.json())
+
+const rss =
+"https://api.rss2json.com/v1/api.json?rss_url=" +
+encodeURIComponent(
+"https://android-developers.blogspot.com/atom.xml"
+);
+
+
+fetch(rss)
+
+.then(response => response.json())
+
 .then(data => {
 
-let html = "";
+    let html = "";
 
-data.items.slice(0,10).forEach(i => {
- html += `
- <p>
- <a href="${i.link}" target="_blank">
- ${i.title}
- </a>
- </p>`;
+    data.items.slice(0,10).forEach(item => {
+
+        let fecha = new Date(item.pubDate)
+        .toLocaleDateString("es-ES");
+
+
+        html += `
+
+        <div class="card">
+
+            <a href="${item.link}" target="_blank">
+                ${item.title}
+            </a>
+
+            <div class="date">
+                📅 ${fecha}
+            </div>
+
+
+            <div class="description">
+                ${item.description.substring(0,250)}...
+            </div>
+
+        </div>
+
+        `;
+
+    });
+
+
+    document.getElementById("news").innerHTML = html;
+
+})
+
+
+.catch(error => {
+
+document.getElementById("news").innerHTML =
+`
+<div class="error">
+❌ No se pudieron cargar las noticias
+<br>
+${error}
+</div>
+`;
+
 });
 
-document.getElementById("noticias").innerHTML = html;
-
-});
 </script>
+
+
+</body>
+</html>
