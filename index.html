@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -10,25 +11,26 @@
 
 body {
     font-family: Arial, Helvetica, sans-serif;
-    background: #f5f7fa;
-    margin: 0;
-    padding: 20px;
-    color: #333;
+    background:#f5f7fa;
+    margin:0;
+    padding:15px;
 }
 
 
 .container {
-    max-width: 900px;
-    margin: auto;
+    max-width:900px;
+    margin:auto;
 }
 
 
 .header {
-    background: #3ddc84;
-    color: white;
-    padding: 18px 22px;
-    border-radius: 12px;
-    margin-bottom: 20px;
+
+    background:#3ddc84;
+    color:white;
+    padding:15px 20px;
+    border-radius:12px;
+    margin-bottom:15px;
+
 }
 
 
@@ -37,64 +39,131 @@ body {
 }
 
 
+/* SLIDER */
+
+.slider {
+
+    position:relative;
+    overflow:hidden;
+
+}
+
+
+.slide {
+
+    display:none;
+
+}
+
+
+.slide.active {
+
+    display:block;
+
+}
+
+
+
 .card {
 
     background:white;
     border-radius:12px;
     padding:18px;
-    margin-bottom:18px;
-    box-shadow:0 2px 8px rgba(0,0,0,.08);
+
+    box-shadow:
+    0 2px 8px rgba(0,0,0,.12);
 
 }
 
-
-.card:hover {
-    transform:translateY(-3px);
-}
-
-
-.card a {
-
-    color:#1976d2;
-    font-size:18px;
-    font-weight:bold;
-    text-decoration:none;
-
-}
-
-
-.card a:hover {
-
-    text-decoration:underline;
-
-}
 
 
 .thumb {
 
     width:100%;
-    max-height:240px;
+    height:230px;
+
     object-fit:cover;
+
     border-radius:10px;
+
     margin-bottom:15px;
 
 }
 
 
-.date {
 
-    color:#777;
-    font-size:13px;
-    margin-top:8px;
+.title {
+
+    color:#1976d2;
+
+    font-size:20px;
+
+    font-weight:bold;
+
+    text-decoration:none;
 
 }
 
 
+
+.date {
+
+    color:#777;
+
+    font-size:13px;
+
+    margin:8px 0;
+
+}
+
+
+
 .description {
 
-    margin-top:12px;
     line-height:1.5;
+
     color:#444;
+
+}
+
+
+
+
+/* BOTONES */
+
+.controls {
+
+    text-align:center;
+
+    margin-top:12px;
+
+}
+
+
+
+button {
+
+    background:#3ddc84;
+
+    border:0;
+
+    color:white;
+
+    padding:8px 15px;
+
+    border-radius:20px;
+
+    cursor:pointer;
+
+    margin:0 5px;
+
+}
+
+
+
+button:hover {
+
+    background:#28b76b;
 
 }
 
@@ -102,21 +171,14 @@ body {
 .loading {
 
     text-align:center;
+
     padding:30px;
 
 }
 
 
-.error {
-
-    background:#ffe0e0;
-    color:#900;
-    padding:15px;
-    border-radius:10px;
-
-}
-
 </style>
+
 
 </head>
 
@@ -131,15 +193,25 @@ body {
 
 <h2>📱 Android Developers</h2>
 
-<p>Últimas noticias</p>
+Últimas noticias
 
 </div>
 
 
 
-<div id="news" class="loading">
+<div id="slider" class="slider loading">
 
 Cargando noticias...
+
+</div>
+
+
+
+<div class="controls">
+
+<button onclick="prev()">⬅</button>
+
+<button onclick="next()">➡</button>
 
 </div>
 
@@ -164,144 +236,110 @@ encodeURIComponent(
 
 
 
+let actual = 0;
+
+let slides = [];
+
+
+
 fetch(rss)
 
 
 
-.then(response => response.json())
+.then(r=>r.json())
 
 
 
-.then(data => {
+.then(data=>{
 
 
+let html="";
 
-let html = "";
 
+data.items.slice(0,8).forEach(item=>{
 
 
-data.items.slice(0,10).forEach(item => {
+let imagen="";
 
 
+let img=item.description.match(/<img[^>]+src="([^">]+)"/);
 
-    // Buscar imagen dentro del artículo
 
-    let imagen = "";
 
-    let img = item.description.match(/<img[^>]+src="([^">]+)"/);
+if(img){
 
+imagen=
 
+`<img class="thumb" src="${img[1]}">`;
 
-    if (img) {
+}
 
 
-        imagen = `
 
-        <img class="thumb" src="${img[1]}">
 
-        `;
+let texto=item.description
 
+.replace(/<[^>]*>/g,'')
 
-    }
+.replace(/&nbsp;/g,' ')
 
+.trim()
 
+.substring(0,220);
 
 
-    // Limpiar HTML del resumen
 
-    let texto = item.description
 
-        .replace(/<[^>]*>/g,'')
+html += `
 
-        .replace(/&nbsp;/g,' ')
 
-        .trim()
 
-        .substring(0,250);
+<div class="slide">
 
 
+<div class="card">
 
 
+${imagen}
 
-    html += `
 
 
+<a class="title"
 
-    <div class="card">
+href="${item.link}"
 
+target="_blank">
 
+${item.title}
 
-        ${imagen}
+</a>
 
 
 
-        <a href="${item.link}" target="_blank">
+<div class="date">
 
-            ${item.title}
+📅 ${new Date(item.pubDate)
 
-        </a>
-
-
-
-        <div class="date">
-
-            📅 ${new Date(item.pubDate)
-
-            .toLocaleDateString("es-ES")}
-
-        </div>
-
-
-
-        <div class="description">
-
-            ${texto}...
-
-        </div>
-
-
-
-    </div>
-
-
-
-    `;
-
-
-
-});
-
-
-
-
-
-document.getElementById("news").innerHTML = html;
-
-
-
-})
-
-
-
-.catch(error => {
-
-
-
-document.getElementById("news").innerHTML =
-
-
-
-`
-
-<div class="error">
-
-❌ No se pudieron cargar las noticias
-
-<br>
-
-${error}
+.toLocaleDateString("es-ES")}
 
 </div>
+
+
+
+<div class="description">
+
+${texto}...
+
+</div>
+
+
+
+</div>
+
+
+</div>
+
+
 
 `;
 
@@ -311,8 +349,91 @@ ${error}
 
 
 
-</script>
+document.getElementById("slider").innerHTML=html;
 
+
+
+slides=document.querySelectorAll(".slide");
+
+
+mostrar(0);
+
+
+
+// automático
+
+setInterval(()=>{
+
+next();
+
+},5000);
+
+
+
+});
+
+
+
+
+
+function mostrar(n){
+
+
+slides.forEach(s=>s.classList.remove("active"));
+
+
+slides[n].classList.add("active");
+
+
+}
+
+
+
+function next(){
+
+
+if(!slides.length)return;
+
+
+actual++;
+
+
+if(actual>=slides.length)
+
+actual=0;
+
+
+
+mostrar(actual);
+
+
+}
+
+
+
+function prev(){
+
+
+if(!slides.length)return;
+
+
+actual--;
+
+
+if(actual<0)
+
+actual=slides.length-1;
+
+
+
+mostrar(actual);
+
+
+}
+
+
+
+</script>
 
 
 </body>
