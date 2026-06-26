@@ -117,32 +117,38 @@ fetch(rss)
 
     data.items.slice(0,10).forEach(item => {
 
-        let fecha = new Date(item.pubDate)
-        .toLocaleDateString("es-ES");
+    let imagen = "";
 
+    if (item.thumbnail) {
+        imagen = `
+        <img src="${item.thumbnail}" 
+        style="width:100%; border-radius:10px; margin-bottom:10px;">
+        `;
+    }
 
-        html += `
+    html += `
 
-        <div class="card">
+    <div class="card">
 
-            <a href="${item.link}" target="_blank">
-                ${item.title}
-            </a>
+        ${imagen}
 
-            <div class="date">
-                📅 ${fecha}
-            </div>
+        <a href="${item.link}" target="_blank">
+            ${item.title}
+        </a>
 
-
-            <div class="description">
-                ${item.description.substring(0,250)}...
-            </div>
-
+        <div class="date">
+            📅 ${new Date(item.pubDate).toLocaleDateString("es-ES")}
         </div>
 
-        `;
+        <div class="description">
+            ${item.description}
+        </div>
 
-    });
+    </div>
+
+    `;
+
+});
 
 
     document.getElementById("news").innerHTML = html;
