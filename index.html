@@ -1,0 +1,22 @@
+<div id="noticias">Cargando...</div>
+
+<script>
+fetch("https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fandroid-developers.blogspot.com%2Fatom.xml")
+.then(r => r.json())
+.then(data => {
+
+let html = "";
+
+data.items.slice(0,10).forEach(i => {
+ html += `
+ <p>
+ <a href="${i.link}" target="_blank">
+ ${i.title}
+ </a>
+ </p>`;
+});
+
+document.getElementById("noticias").innerHTML = html;
+
+});
+</script>
